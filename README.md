@@ -51,6 +51,66 @@ At this point you have increased the size of the block volume where your root fi
 
 And that’s it. You just allocated the free space left behind by the Ubuntu installer to your root filesystem. If this is still not enough space, continue on to the next section to allocate more space by extending an underlying disk.
 
+
+
+# Script to Automate Logical Volume and Filesystem Extension
+
+## Script Content
+
+```bash
+#!/bin/bash
+
+# Display initial disk usage
+echo "Initial disk usage:"
+df -h
+
+# Display volume group information
+echo -e "\nVolume group information:"
+sudo vgdisplay
+
+# Display logical volume information
+echo -e "\nLogical volume information:"
+sudo lvdisplay
+
+# Display disk usage again
+echo -e "\nCurrent disk usage:"
+df -h
+
+# Display volume group information again
+echo -e "\nChecking volume group status:"
+sudo vgdisplay
+
+# Extend logical volume to use all free space
+echo -e "\nExtending logical volume..."
+sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+
+# Display disk usage after extension
+echo -e "\nDisk usage after LV extension:"
+df -h
+
+# Resize the filesystem
+echo -e "\nResizing filesystem..."
+sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+
+# Display final disk usage
+echo -e "\nFinal disk usage:"
+df -h
+
+```
+
+To use this script:
+
+Save it as
+extend_lvm.sh
+
+Make it executable:
+```
+chmod +x extend_lvm.sh
+```
+bash
+```
+sudo ./extend_lvm.sh
+```
 Use Space from Extended Physical (or Virtual) Disk
 --------------------------------------------------
 
